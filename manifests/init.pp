@@ -55,7 +55,7 @@ class mms (
   package { 'python-setuptools':
     ensure => installed
   }
-  package { ['gcc', 'python-devel']:
+  package { ['gcc', 'python-dev']:
     ensure => installed
   }
   package { 'wget':
@@ -68,7 +68,7 @@ class mms (
   }
 
   exec { 'download-mms':
-    command => "wget ${download_url} ${tmp_dir}",
+    command => "wget ${download_url} -P ${tmp_dir}",
     path    => ['/bin', '/usr/bin'],
     require => Package['wget'],
     creates => '/tmp/mms/monitoring-agent.tar.gz'
