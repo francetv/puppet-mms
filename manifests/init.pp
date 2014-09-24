@@ -56,7 +56,7 @@ class mms (
 
     ensure => installed
   }
-  package { ['gcc', 'python-dev']:
+  package { ['gcc', 'python-dev', 'python-setuptools']:
     ensure => installed
   }
   package { 'wget':
