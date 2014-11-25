@@ -1,67 +1,59 @@
 #!/bin/bash
-# mongodb-mms-agent daemon
-# chkconfig: 345 20 80
-# description: 10gen mms mms agent 
-# processname: mongodb-mms-agent
-
-PYTHON=/usr/bin/python
-DAEMON_PATH=<%=@install_dir%>
-
-DAEMON=agent.py
-DAEMONOPTS=""
-
-NAME=mms-agent
-DESC="10gen MMS Backup Agent"
-PIDFILE=/var/run/$NAME.pid
-SCRIPTNAME=/etc/init.d/$NAME
-LOGFILE=/var/log/mongo/mms-agent.log
-
+#
+# mongodb-mms This starts and stops mongodb-mms
+#
+# chkconfig: 2345 12 88
+# description: mongodb-mms is mongodb-mms
+# processname:mongodb-mms
+# pidfile: /var/run/mongodb-mms.pid
+### BEGIN INIT INFO
+# Provides: $mongodb-mms
+### END INIT INFO
+# Source function library.
+. /etc/init.d/functions
+binary="/opt/mms/mongodb-mms.pl"
+[ -x $binary ] || exit 0
+RETVAL=0
+start() {
+    echo -n "Starting mongodb-mms: "
+    daemon $binary
+    RETVAL=$?
+    PID=$!
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/XXXXXXXXXXXX
+    echo $PID > /var/run/mongodb-mms.pid
+}
+stop() {
+    echo -n "Shutting down mongodb-mms: "
+    killproc XXXXXXXXXXXX
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+        rm -f /var/lock/subsys/mongodb-mms
+        rm -f /var/run/mongodb-mms.pid
+    fi
+}
+restart() {
+    echo -n "Restarting mongodb-mms: "
+    stop
+    sleep 2
+    start
+}
 case "$1" in
-start)
-        printf "%-50s" "Starting $NAME..."
-        cd $DAEMON_PATH
-        PID=`$PYTHON $DAEMON $DAEMONOPTS > $LOGFILE 2>&1 & echo $!`
-
-        #echo "Saving PID" $PID " to " $PIDFILE
-        if [ -z $PID ]; then
-            printf "%s\n" "Fail"
-        else
-            echo $PID > $PIDFILE
-            printf "%s\n" "Ok"
-        fi
-;;
-status)
-        printf "%-50s" "Checking $NAME..."
-        if [ -f $PIDFILE ]; then
-            PID=`cat $PIDFILE`
-            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
-                printf "%s\n" "Process dead but pidfile exists"
-            else
-                echo "Running"
-            fi
-        else
-            printf "%s\n" "Service not running"
-        fi
-;;
-stop)
-        printf "%-50s" "Stopping $NAME"
-            PID=`cat $PIDFILE`
-            cd $DAEMON_PATH
-        if [ -f $PIDFILE ]; then
-            kill -HUP $PID
-            printf "%s\n" "Ok"
-            rm -f $PIDFILE
-        else
-            printf "%s\n" "pidfile not found"
-        fi
-;;
-
-restart)
-        $0 stop
-        $0 start
-;;
-
-*)
-        echo "Usage: $0 {status|start|stop|restart}"
-        exit 1
+    start)
+        start
+    ;;
+    stop)
+        stop
+    ;;
+    status)
+        status mongodb-mms
+    ;;
+    restart)
+        restart
+    ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}"
+    ;;
 esac
+exit 0

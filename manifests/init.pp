@@ -14,10 +14,6 @@
 # [*install_dir*]
 #   The location where the mms agent will be installed.
 #
-# [*download_url*]
-#   The location from where to download the mms agent. You probably won't need
-#   to change this.
-#
 # [*tmp_dir*]
 #   The temporary location to where files will be downloaded before installation.
 #
@@ -46,33 +42,16 @@
 #
 class mms (
   $api_key,
-  $install_dir  = $mms::params::install_dir,
-  $download_url = $mms::params::download_url,
+  $install_dir  = '/opt/mms', #$mms::params::install_dir,
   $tmp_dir      = $mms::params::tmp_dir,
   $mms_server   = $mms::params::mms_server,
   $mms_user     = $mms::params::mms_user
 ) inherits mms::params {
-  package { 'py/setuptools':
-
-    ensure => installed
-  }
-  package { ['gcc', 'python-dev', 'python-setuptools']:
+  package { ['libdaemon-control-perl']:
     ensure => installed
   }
   package { 'wget':
     ensure => installed
-  }
-  exec { 'install-pymongo':
-    command => 'easy_install -U pymongo',
-    path    => ['/bin', '/usr/bin'],
-    require => Package['python-setuptools']
-  }
-
-  exec { 'download-mms':
-    command => "wget ${download_url} -P ${tmp_dir} -O monitoring-agent.tar.gz",
-    path    => ['/bin', '/usr/bin'],
-    require => Package['wget'],
-    creates => '/tmp/monitoring-agent.tar.gz'
   }
 
   file { $install_dir:
@@ -88,22 +67,31 @@ class mms (
     ensure => present
   }
 
-  exec { 'install-mms':
-    command => "tar -C ${install_dir} xzf /tmp/monitoring-agent.tar.gz",
-    path    => ['/bin', '/usr/bin'],
-    require => [Exec['download-mms'], File[$install_dir]]
+  file { '/opt/mms/mongodb-mms-monitoring-agent':
+    source  => "puppet:///modules/mms/mongodb-mms-monitoring-agent",
+    require => [File[$install_dir]]
+  }
+
+  file { '/opt/mms/monitoring-agent.config':
+    source  => "puppet:///modules/mms/monitoring-agent.config",
+    require => [File[$install_dir]]
+  }
+
+  file { '/opt/mms/mongodb-mms.pl':
+    source  => "puppet:///modules/mms/mongodb-mms.pl",
+    require => [File[$install_dir]]
   }
 
   exec { 'set-license-key':
-    command => "sed -ie 's|@API_KEY@|${api_key}|' ${install_dir}/settings.py",
+    command => "sed -ie 's|@API_KEY@|${api_key}|' ${install_dir}/monitoring-agent.config",
     path    => ['/bin', '/use/bin'],
-    require => Exec['install-mms']
+    require => [File[/opt/mms/monitoring-agent.config']]
   }
 
   exec { 'set-mms-server':
-    command => "sed -ie 's|@MMS_SERVER@|${mms_server}|' ${install_dir}/settings.py",
+    command => "sed -ie 's|@MMS_SERVER@|${mms_server}|' ${install_dir}/monitoring-agent.config",
     path    => ['/bin', '/usr/bin'],
-    require => Exec['install-mms']
+    require => [File[/opt/mms/monitoring-agent.config']]
   }
 
   file { '/etc/init.d/mongodb-mms':

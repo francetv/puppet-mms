@@ -8,27 +8,17 @@ describe 'mms', :type => :class do
 
     it { should contain_package('wget') }
     it { should contain_package('gcc') }
-    it { should contain_package('python-devel') } # centos
-    it { should contain_package('python-setuptools') }
+    it { should contain_package('perl') } # centos
 
     it { should contain_file('/opt/mms') }
-    it { should contain_file('/etc/init.d/mongodb-mms').with_content(/DAEMON_PATH=\/opt\/mms/)}
+    it { should contain_file('/etc/init.d/mongodb-mms')}
   
-    it { should contain_exec('download-mms').with(
-      :command => 'wget https://mms.mongodb.com/settings/mms-monitoring-agent.tar.gz /tmp',
-    ).that_requires('Package[wget]') }
-
     it { should contain_exec('set-mms-server').with(
-      :command => "sed -ie 's|@MMS_SERVER@|https://mms.mongodb.com|' /opt/mms/settings.py"
+      :command => "sed -ie 's|@MMS_SERVER@|https://mms.mongodb.com|' /opt/mms/monitoring-agent.config"
     ) }
     it { should contain_exec('set-license-key').with(
-      :command => "sed -ie 's|@API_KEY@|abcdefg|' /opt/mms/settings.py"
+      :command => "sed -ie 's|@API_KEY@|abcdefg|' /opt/mms/monitoring-agent.config"
     ) }
-
-    it { should contain_exec('install-mms')
-      .that_requires('File[/opt/mms]')
-      .that_requires('Exec[download-mms]')
-    }
 
     it { should contain_service('mongodb-mms').with(
       :enable => true,
@@ -39,14 +29,10 @@ describe 'mms', :type => :class do
   context 'with custom download_url' do
       let(:params) { {
           :api_key => 'abcdefg',
-          :download_url => 'custom-download-url',
       } }
 
       it { should compile }
 
-      it { should contain_exec('download-mms').with(
-          :command => 'wget custom-download-url /tmp'
-      ) }
   end
 
   context 'with custom tmp_dir' do
@@ -56,10 +42,6 @@ describe 'mms', :type => :class do
       } }
 
       it { should compile }
-
-      it { should contain_exec('download-mms').with(
-          :command => 'wget https://mms.mongodb.com/settings/mms-monitoring-agent.tar.gz /my/tmp'
-      ) }
   end
 
   context 'with custom mms_server' do
@@ -71,7 +53,7 @@ describe 'mms', :type => :class do
       it { should compile }
 
       it { should contain_exec('set-mms-server').with(
-          :command => "sed -ie 's|@MMS_SERVER@|custom-mms-server|' /opt/mms/settings.py"
+          :command => "sed -ie 's|@MMS_SERVER@|custom-mms-server|' /opt/mms/monitoring-agent.config"
       ) }
   end
 
