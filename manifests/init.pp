@@ -47,7 +47,7 @@ class mms (
   $mms_server   = $mms::params::mms_server,
   $mms_user     = $mms::params::mms_user
 ) inherits mms::params {
-  package { ['libdaemon-control-perl']:
+  package { ['perl']:
     ensure => installed
   }
   package { 'wget':
@@ -69,22 +69,37 @@ class mms (
 
   file { '/opt/mms/mongodb-mms-monitoring-agent':
     source  => "puppet:///modules/mms//opt/mms/mongodb-mms-monitoring-agent",
+    mode    => '0754',
+    owner   => $mms_user,
+    group   => $mms_user,
     require => [File[$install_dir]]
   }
 
   file { '/opt/mms/monitoring-agent.config':
     source  => "puppet:///modules/mms//opt/mms/monitoring-agent.config",
+    mode    => '0754',
+    owner   => $mms_user,
+    group   => $mms_user,
     require => [File[$install_dir]]
   }
 
   file { '/opt/mms/mongodb-mms.pl':
     source  => "puppet:///modules/mms/opt/mms/mongodb-mms.pl",
+    mode    => '0754',
+    owner   => $mms_user,
+    group   => $mms_user,
     require => [File[$install_dir]]
   }
 
+
+  exec { 'package-install':
+  command => "export PERL_MM_USE_DEFAULT=1 ; export PERL_EXTUTILS_AUTOINSTALL=\"--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
+  path    => ['/bin', '/usr/bin'],
+  } 
+
   exec { 'set-license-key':
     command => "sed -ie 's|@API_KEY@|${api_key}|' ${install_dir}/monitoring-agent.config",
-    path    => ['/bin', '/use/bin'],
+    path    => ['/bin', '/usr/bin'],
     require => [File['/opt/mms/monitoring-agent.config']]
   }
 

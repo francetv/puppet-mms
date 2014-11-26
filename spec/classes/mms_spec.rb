@@ -5,14 +5,13 @@ describe 'mms', :type => :class do
     let(:params) { { :api_key => 'abcdefg' } }
 
     it { should compile }
-
+ 
     it { should contain_package('wget') }
     it { should contain_package('gcc') }
-    it { should contain_package('perl') } # centos
-
+    it { should contain_package('perl') }
     it { should contain_file('/opt/mms') }
     it { should contain_file('/etc/init.d/mongodb-mms')}
-  
+    it { should contain_exec('package-install')}
     it { should contain_exec('set-mms-server').with(
       :command => "sed -ie 's|@MMS_SERVER@|https://mms.mongodb.com|' /opt/mms/monitoring-agent.config"
     ) }

@@ -10,22 +10,22 @@
 # Provides: $mongodb-mms
 ### END INIT INFO
 # Source function library.
-. /etc/init.d/functions
 binary="/opt/mms/mongodb-mms.pl"
 [ -x $binary ] || exit 0
 RETVAL=0
 start() {
     echo -n "Starting mongodb-mms: "
-    daemon $binary
+    $binary start
     RETVAL=$?
     PID=$!
     echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/XXXXXXXXXXXX
+    [ $RETVAL -eq 0 ] && touch /var/mms
     echo $PID > /var/run/mongodb-mms.pid
 }
 stop() {
     echo -n "Shutting down mongodb-mms: "
-    killproc XXXXXXXXXXXX
+    $binary stop
+    killall mongodb-mms
     RETVAL=$?
     echo
     if [ $RETVAL -eq 0 ]; then
@@ -35,9 +35,9 @@ stop() {
 }
 restart() {
     echo -n "Restarting mongodb-mms: "
-    stop
+    $binary stop
     sleep 2
-    start
+    $binary start
 }
 case "$1" in
     start)
@@ -47,7 +47,7 @@ case "$1" in
         stop
     ;;
     status)
-        status mongodb-mms
+        $binary status
     ;;
     restart)
         restart
