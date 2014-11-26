@@ -68,17 +68,17 @@ class mms (
   }
 
   file { '/opt/mms/mongodb-mms-monitoring-agent':
-    source  => "puppet:///modules/mms/mongodb-mms-monitoring-agent",
+    source  => "puppet:///modules/mms//opt/mms/mongodb-mms-monitoring-agent",
     require => [File[$install_dir]]
   }
 
   file { '/opt/mms/monitoring-agent.config':
-    source  => "puppet:///modules/mms/monitoring-agent.config",
+    source  => "puppet:///modules/mms//opt/mms/monitoring-agent.config",
     require => [File[$install_dir]]
   }
 
   file { '/opt/mms/mongodb-mms.pl':
-    source  => "puppet:///modules/mms/mongodb-mms.pl",
+    source  => "puppet:///modules/mms/opt/mms/mongodb-mms.pl",
     require => [File[$install_dir]]
   }
 
