@@ -66,9 +66,10 @@ class mms (
   user { $mms_user :
     ensure => present
   }
+   
 
   file { '/opt/mms/mongodb-mms-monitoring-agent':
-    source  => "puppet:///modules/mms//opt/mms/mongodb-mms-monitoring-agent",
+    source  => "puppet:///modules/mms/opt/mms/mongodb-mms-monitoring-agent",
     mode    => '0754',
     owner   => $mms_user,
     group   => $mms_user,
@@ -76,7 +77,7 @@ class mms (
   }
 
   file { '/opt/mms/monitoring-agent.config':
-    source  => "puppet:///modules/mms//opt/mms/monitoring-agent.config",
+    source  => "puppet:///modules/mms/opt/mms/monitoring-agent.config",
     mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
@@ -93,7 +94,7 @@ class mms (
 
 
   exec { 'package-install':
-  command => "export PERL_MM_USE_DEFAULT=1 ; export PERL_EXTUTILS_AUTOINSTALL=\"--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
+  command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
   path    => ['/bin', '/usr/bin'],
   } 
 
