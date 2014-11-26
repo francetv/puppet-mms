@@ -85,13 +85,13 @@ class mms (
   exec { 'set-license-key':
     command => "sed -ie 's|@API_KEY@|${api_key}|' ${install_dir}/monitoring-agent.config",
     path    => ['/bin', '/use/bin'],
-    require => [File[/opt/mms/monitoring-agent.config']]
+    require => [File['/opt/mms/monitoring-agent.config']]
   }
 
   exec { 'set-mms-server':
     command => "sed -ie 's|@MMS_SERVER@|${mms_server}|' ${install_dir}/monitoring-agent.config",
     path    => ['/bin', '/usr/bin'],
-    require => [File[/opt/mms/monitoring-agent.config']]
+    require => [File['/opt/mms/monitoring-agent.config']]
   }
 
   file { '/etc/init.d/mongodb-mms':
