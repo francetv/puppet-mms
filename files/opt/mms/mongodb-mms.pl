@@ -11,6 +11,8 @@ exit Daemon::Control->new(
     scan_name   => 'qr|/mongodb-mms-monitoring-agent|',
     lsb_sdesc   => 'Controleur MMS',
     lsb_desc    => 'Controleur MMS etendu',
+    user        => 'mms',
+    group       => 'mms',
     path        => '/opt/mms',
     directory   => '/opt/mms', 
     program     => '/opt/mms/mongodb-mms-monitoring-agent',

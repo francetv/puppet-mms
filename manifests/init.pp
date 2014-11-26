@@ -77,7 +77,7 @@ class mms (
 
   file { '/opt/mms/monitoring-agent.config':
     source  => "puppet:///modules/mms//opt/mms/monitoring-agent.config",
-    mode    => '0754',
+    mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
     require => [File[$install_dir]]
@@ -111,6 +111,7 @@ class mms (
 
   file { '/etc/init.d/mongodb-mms':
     content => template('mms/etc/init.d/mongodb-mms.erb'),
+    mode    => '0744',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
 
