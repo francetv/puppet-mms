@@ -89,6 +89,7 @@ class mms (
     mode    => '0754',
     owner   => $mms_user,
     group   => $mms_user,
+    notify  => Service['mongodb-mms'],
     require => [File[$install_dir]]
   }
 
