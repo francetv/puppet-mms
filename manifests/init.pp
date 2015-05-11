@@ -113,7 +113,9 @@ class mms (
 
   file { '/etc/init.d/mongodb-mms':
     content => template('mms/etc/init.d/mongodb-mms.erb'),
-    mode    => '0744',
+    mode    => 0755,
+    owner   => 'root',
+     group   => 'root',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
 
