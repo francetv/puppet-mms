@@ -90,11 +90,11 @@ class mms (
     owner   => $mms_user,
     group   => $mms_user,
     notify  => Service['mongodb-mms'],
-    require => [Exec ['package-init']]
+    require => [Exec['package-init']]
   }
 
 
-  exec  { 'package-install':
+  exec { 'package-install':
    command => "cd /tmp; curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
    path    => ['/bin', '/usr/bin'],
   }
@@ -102,7 +102,7 @@ class mms (
   exec { 'package-init':
   command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
   path    => ['/bin', '/usr/bin'],
-  require => [Exec ['package-install']]
+  require => [Exec['package-install']]
   } 
  
   exec { 'set-license-key':
