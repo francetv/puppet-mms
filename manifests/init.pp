@@ -90,7 +90,7 @@ class mms (
     owner   => $mms_user,
     group   => $mms_user,
     notify  => Service['mongodb-mms'],
-    require => [Exec ['package-init']]
+    require => [Exec['package-init']]
   }
 
 
