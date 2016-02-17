@@ -81,7 +81,7 @@ class mms (
     mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
-    require => [Exec['package-init']]
+    require => [Exec['package-init']],
   }
 
   file { '/etc/mongodb-mms/mongodb-mms.pl':
@@ -90,13 +90,13 @@ class mms (
     owner   => $mms_user,
     group   => $mms_user,
     notify  => Service['mongodb-mms'],
-    require => [Exec['package-init']]
+    require => [Exec['package-init']],
   }
 
 
   exec { 'package-install':
    command => "cd /tmp; curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
-   path    => ['/bin', '/usr/bin'],
+   path    => ['/bin', '/usr/bin']
   }
 
   exec { 'package-init':
