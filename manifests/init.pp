@@ -81,7 +81,7 @@ class mms (
     mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
-    require => [Exec ['package-init']]
+    require => [Exec['package-init']]
   }
 
   file { '/etc/mongodb-mms/mongodb-mms.pl':
@@ -102,7 +102,7 @@ class mms (
   exec { 'package-init':
   command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
   path    => ['/bin', '/usr/bin'],
-  require => [Exec ['package-install']]
+  require => [Exec['package-install']]
   } 
  
   exec { 'set-license-key':
