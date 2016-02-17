@@ -95,7 +95,7 @@ class mms (
 
 
   exec { 'package-install':
-   command => "cd /tmp; curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
+   command => "curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
    path    => ['/bin', '/usr/bin']
   }
 
@@ -124,7 +124,6 @@ class mms (
      group   => 'root',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
-
   service { 'mongodb-mms':
     enable => true,
     ensure => running,
