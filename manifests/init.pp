@@ -42,7 +42,7 @@
 #
 class mms (
   $api_key,
-  $install_dir  = '/usr/bin/', #$mms::params::install_dir,
+  $install_dir  = '/etc/mongodb-mms/', #$mms::params::install_dir,
   $tmp_dir      = $mms::params::tmp_dir,
   $mms_server   = $mms::params::mms_server,
   $mms_user     = $mms::params::mms_user
@@ -54,14 +54,14 @@ class mms (
     ensure => installed
   }
 
-#  file { $install_dir:
-#    ensure  => directory,
-#    mode    => '0755',
-#    recurse => true,
-#    owner   => $mms_user,
-#    group   => $mms_user,
-#    require => User[$mms_user]
-#  }
+  file { $install_dir:
+    ensure  => directory,
+    mode    => '0755',
+    recurse => true,
+    owner   => $mms_user,
+    group   => $mms_user,
+    require => User[$mms_user]
+  }
 
   user { $mms_user :
     ensure => present
@@ -90,12 +90,12 @@ class mms (
     owner   => $mms_user,
     group   => $mms_user,
     notify  => Service['mongodb-mms'],
-    require => [Exec['package-init']],
+    require => [File[$install_dir]]
   }
 
 
   exec { 'package-install':
-   command => "curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
+   command => "cd /tmp; curl -OL https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb; dpkg -i mongodb-mms-monitoring-agent_latest_amd64.deb; rm mongodb-mms-monitoring-agent_latest_amd64.deb",
    path    => ['/bin', '/usr/bin']
   }
 
@@ -118,12 +118,13 @@ class mms (
   }
 
   file { '/etc/init.d/mongodb-mms':
-    content => template('mms/etc/init.d/mongodb-mms.pl.erb'),
+    content => template('mms/etc/init.d/mongodb-mms.erb'),
     mode    => 0755,
     owner   => 'root',
      group   => 'root',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
+
   service { 'mongodb-mms':
     enable => true,
     ensure => running,
