@@ -67,7 +67,6 @@ class mms (
     ensure => present
   }
    
-
 #  file { '/opt/mms/mongodb-mms-monitoring-agent':
 #    source  => "puppet:///modules/mms/opt/mms/mongodb-mms-monitoring-agent",
 #    mode    => '0754',
