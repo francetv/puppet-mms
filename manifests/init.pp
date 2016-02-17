@@ -118,7 +118,7 @@ class mms (
   }
 
   file { '/etc/init.d/mongodb-mms':
-    content => template('mms/etc/init.d/mongodb-mms.erb'),
+    content => template('mms/etc/init.d/mongodb-mms.pl.erb'),
     mode    => 0755,
     owner   => 'root',
      group   => 'root',
