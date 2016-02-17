@@ -13,9 +13,9 @@ exit Daemon::Control->new(
     lsb_desc    => 'Controleur MMS etendu',
     user        => 'mms',
     group       => 'mms',
-    path        => '/opt/mms',
-    directory   => '/opt/mms', 
-    program     => '/opt/mms/mongodb-mms-monitoring-agent',
+    path        => '/usr/bin',
+    directory   => '/usr/bin', 
+    program     => '/usr/bin/mongodb-mms-monitoring-agent',
     program_args => [ '> /dev/null 2>&1' ],
  
     pid_file    => '/tmp/mms_agent.pid',
