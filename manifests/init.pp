@@ -94,10 +94,10 @@ class mms (
 
   exec { 'package-install':
     command => "/usr/bin/wget 'https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb' -O /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /usr/bin/dpkg -i /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ", #; /bin/rm /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb",
-    path    => ['/bin', '/usr/bin'],
+    path    => ['/bin', '/usr/bin', '/usr/local/sbin'],
     creates => "/usr/bin/mongodb-mms-monitoring-agent",
     require => [File[$install_dir]]
-  }
+  } 
 
   exec { 'package-init':
   command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
