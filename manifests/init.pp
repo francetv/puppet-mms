@@ -67,14 +67,6 @@ class mms (
     ensure => present
   }
    
-#  file { '/opt/mms/mongodb-mms-monitoring-agent':
-#    source  => "puppet:///modules/mms/opt/mms/mongodb-mms-monitoring-agent",
-#    mode    => '0754',
-#    owner   => $mms_user,
-#    group   => $mms_user,
-#    require => [File[$install_dir]]
-#  }
-
   file { '/etc/mongodb-mms/monitoring-agent.config':
     source  => "puppet:///modules/mms/opt/mms/monitoring-agent.config",
     mode    => '0554',
@@ -83,26 +75,18 @@ class mms (
     require => [Exec['package-init']],
   }
 
-  file { '/etc/mongodb-mms/mongodb-mms.pl':
-    source  => "puppet:///modules/mms/opt/mms/mongodb-mms.pl",
-    mode    => '0754',
+  file { "/usr/bin/mongodb-mms-monitoring-agent":
+    mode    => '0755',
     owner   => $mms_user,
     group   => $mms_user,
-    notify  => Service['mongodb-mms'],
-    require => [File[$install_dir]]
+    require => [Exec['package-install']]
   }
 
   exec { 'package-install':
-    command => "/usr/bin/wget 'https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb' -O /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /usr/bin/dpkg -i /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ", #; /bin/rm /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb",
+    command => "/usr/bin/wget 'https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb' -O /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /usr/bin/dpkg -i /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb; /bin/rm /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb",
     path    => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
     creates => "/usr/bin/mongodb-mms-monitoring-agent",
     require => [File[$install_dir]]
-  } 
-
-  exec { 'package-init':
-  command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
-  path    => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-  require => [Exec['package-install']]
   } 
  
   exec { 'set-license-key':
@@ -121,7 +105,7 @@ class mms (
     content => template('mms/etc/init.d/mongodb-mms.erb'),
     mode    => 0755,
     owner   => 'root',
-     group   => 'root',
+    group   => 'root',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
 
