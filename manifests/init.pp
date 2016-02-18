@@ -89,7 +89,6 @@ class mms (
     owner   => $mms_user,
     group   => $mms_user,
     notify  => Service['mongodb-mms'],
-    require => [File[$install_dir]]
   }
 
   exec { 'package-install':
