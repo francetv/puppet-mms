@@ -21,8 +21,8 @@ DAEMON=/usr/bin/$NAME
 DAEMON_ARGS=" -conf /etc/mongodb-mms/monitoring-agent.config >> /dev/null 2>&1"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-UID=mongodb-mms-agent
-GID=mongodb-mms-agent
+UID=mms
+GID=mms
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
