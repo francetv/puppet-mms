@@ -42,7 +42,7 @@
 #
 class mms (
   $api_key,
-  $install_dir  = '/opt/mms', #$mms::params::install_dir,
+  $install_dir  = '/etc/mongodb-mms/', #$mms::params::install_dir,
   $tmp_dir      = $mms::params::tmp_dir,
   $mms_server   = $mms::params::mms_server,
   $mms_user     = $mms::params::mms_user
@@ -66,52 +66,62 @@ class mms (
   user { $mms_user :
     ensure => present
   }
+   
+#  file { '/opt/mms/mongodb-mms-monitoring-agent':
+#    source  => "puppet:///modules/mms/opt/mms/mongodb-mms-monitoring-agent",
+#    mode    => '0754',
+#    owner   => $mms_user,
+#    group   => $mms_user,
+#    require => [File[$install_dir]]
+#  }
 
-  file { '/opt/mms/mongodb-mms-monitoring-agent':
-    source  => "puppet:///modules/mms//opt/mms/mongodb-mms-monitoring-agent",
-    mode    => '0754',
-    owner   => $mms_user,
-    group   => $mms_user,
-    require => [File[$install_dir]]
-  }
-
-  file { '/opt/mms/monitoring-agent.config':
-    source  => "puppet:///modules/mms//opt/mms/monitoring-agent.config",
+  file { '/etc/mongodb-mms/monitoring-agent.config':
+    source  => "puppet:///modules/mms/opt/mms/monitoring-agent.config",
     mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
-    require => [File[$install_dir]]
+    require => [Exec['package-init']],
   }
 
-  file { '/opt/mms/mongodb-mms.pl':
+  file { '/etc/mongodb-mms/mongodb-mms.pl':
     source  => "puppet:///modules/mms/opt/mms/mongodb-mms.pl",
     mode    => '0754',
     owner   => $mms_user,
     group   => $mms_user,
+    notify  => Service['mongodb-mms'],
     require => [File[$install_dir]]
   }
 
-
   exec { 'package-install':
-  command => "export PERL_MM_USE_DEFAULT=1 ; export PERL_EXTUTILS_AUTOINSTALL=\"--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
-  path    => ['/bin', '/usr/bin'],
-  } 
+    command => "/usr/bin/wget 'https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb' -O /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /usr/bin/dpkg -i /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /bin/rm /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb",
+    path    => ['/tmp'],
+    creates => "/usr/bin/mongodb-mms-monitoring-agent",
+    require => [File['/etc/mongodb-mms/monitoring-agent.config']]
+  }
 
+  exec { 'package-init':
+  command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
+  path    => ['/bin', '/usr/bin'],
+  require => [Exec['package-install']]
+  } 
+ 
   exec { 'set-license-key':
-    command => "sed -ie 's|@API_KEY@|${api_key}|' ${install_dir}/monitoring-agent.config",
+    command => "sed -ie 's|@API_KEY@|${api_key}|' /etc/mongodb-mms/monitoring-agent.config",
     path    => ['/bin', '/usr/bin'],
-    require => [File['/opt/mms/monitoring-agent.config']]
+    require => [File['/etc/mongodb-mms/monitoring-agent.config']]
   }
 
   exec { 'set-mms-server':
-    command => "sed -ie 's|@MMS_SERVER@|${mms_server}|' ${install_dir}/monitoring-agent.config",
+    command => "sed -ie 's|@MMS_SERVER@|${mms_server}|' /etc/mongodb-mms/monitoring-agent.config",
     path    => ['/bin', '/usr/bin'],
-    require => [File['/opt/mms/monitoring-agent.config']]
+    require => [File['/etc/mongodb-mms/monitoring-agent.config']]
   }
 
   file { '/etc/init.d/mongodb-mms':
     content => template('mms/etc/init.d/mongodb-mms.erb'),
-    mode    => '0744',
+    mode    => 0755,
+    owner   => 'root',
+     group   => 'root',
     require => [Exec['set-license-key'], Exec['set-mms-server']]
   }
 
