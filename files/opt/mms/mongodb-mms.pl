@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Daemon::Control;
 my $process=2;
- 
+
 exit Daemon::Control->new(
     name        => "MMS agent",
     lsb_start   => '$syslog $remote_fs',
@@ -22,4 +22,3 @@ exit Daemon::Control->new(
     stdout_file => '/tmp/mms_agent.out', 
     fork        => $process,
 )->run;
-
