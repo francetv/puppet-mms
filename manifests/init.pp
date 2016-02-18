@@ -72,7 +72,7 @@ class mms (
     mode    => '0554',
     owner   => $mms_user,
     group   => $mms_user,
-    require => [Exec['package-init']],
+    require => [Exec['package-install']],
   }
 
   file { "/usr/bin/mongodb-mms-monitoring-agent":
