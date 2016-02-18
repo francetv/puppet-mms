@@ -94,10 +94,10 @@ class mms (
 
 
   exec { 'package-install':
-#    command => "curl -o- https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb | dpkg --install",
     command => "/usr/bin/wget 'https://cloud.mongodb.com/download/agent/monitoring/mongodb-mms-monitoring-agent_latest_amd64.deb' -O /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /usr/bin/dpkg -i /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb ; /bin/rm /tmp/mongodb-mms-monitoring-agent_latest_amd64.deb",
     path    => ['/tmp'],
-    creates => "/usr/bin/mongodb-mms-monitoring-agent"
+    creates => "/usr/bin/mongodb-mms-monitoring-agent",
+    require => [File['/etc/mongodb-mms/monitoring-agent.config']]
   }
 
   exec { 'package-init':
