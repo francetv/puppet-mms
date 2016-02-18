@@ -98,13 +98,12 @@ class mms (
     creates => "/usr/bin/mongodb-mms-monitoring-agent",
     require => [File[$install_dir]]
   }
-
   exec { 'package-init':
   command => "/bin/bash -c \"export PERL_MM_USE_DEFAULT=1\" ; /bin/bash -c \"export PERL_EXTUTILS_AUTOINSTALL=--defaultdeps\"; perl -MCPAN -e \"install Daemon::Control\"",
   path    => ['/bin', '/usr/bin'],
   require => [Exec['package-install']]
   } 
-
+ 
   exec { 'set-license-key':
     command => "sed -ie 's|@API_KEY@|${api_key}|' /etc/mongodb-mms/monitoring-agent.config",
     path    => ['/bin', '/usr/bin'],
