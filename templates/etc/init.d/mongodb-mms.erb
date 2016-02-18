@@ -21,7 +21,7 @@
 ### Provides: $mongodb-mms
 ##### END INIT INFO
 ### Source function library.
-binary="/opt/mms/mongodb-mms.pl"
+binary="/etc/mongodb-mms/mongodb-mms.pl"
 [ -x $binary ] || exit 0
 RETVAL=0
 start() {
@@ -68,4 +68,3 @@ case "$1" in
     ;;
 esac
 exit 0
-
